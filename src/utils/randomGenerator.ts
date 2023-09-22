@@ -1,5 +1,5 @@
 import { Personnage } from '../models/personnage';
-import { db } from '../config/db';
+// import { db } from '../config/db';
 
 export const generateRandomPersonnage = async (): Promise<Personnage> => {
   const personnage = {
