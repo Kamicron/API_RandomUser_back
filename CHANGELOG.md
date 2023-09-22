@@ -9,6 +9,11 @@ This file outlines all the significant changes made to the project. The format i
 - Connection to MySQL database - local
 - Basic API endpoint for random firstnames
 
+## [0.1.1] - 2023-09-22
+
+### 📦 Added
+- installation of core
+
 ## [0.1.0] - 2023-09-22
 
 ### 📦 Added

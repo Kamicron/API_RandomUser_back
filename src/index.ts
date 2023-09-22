@@ -1,9 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 import { initializeConnection } from './config/db'; // Mettez à jour le chemin si nécessaire
 import pnjRouter from './routes/pnjRouter'; // Importez votre routeur pnjRouter
 
 const app = express();
 const port = 3001; // Vous pouvez changer le port selon vos besoins
+app.use(cors());
 
 const startServer = async () => {
   try {
