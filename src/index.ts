@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { initializeConnection } from './config/db'; // Mettez à jour le chemin si nécessaire
-import pnjRouter from './routes/pnjRouter'; // Importez votre routeur pnjRouter
+import mainRouter from './routes';
 
 const app = express();
 const port = 3001; // Vous pouvez changer le port selon vos besoins
@@ -16,8 +16,9 @@ const startServer = async () => {
     app.use(express.json());
     
     // Utilisation des routeurs
-    app.use('/pnj', pnjRouter); // Utilisez le routeur pnjRouter sur le chemin '/pnj'
-    
+    app.use('/', mainRouter);
+
+
     app.listen(port, () => {
       console.log(`Serveur en écoute sur http://localhost:${port}/`);
     });

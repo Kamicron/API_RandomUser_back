@@ -9,6 +9,16 @@ This file outlines all the significant changes made to the project. The format i
 - Connection to MySQL database - local
 - Basic API endpoint for random firstnames
 
+## [0.1.2] - 2023-09-23
+
+### 📦 Added
+- Add endpoint : get-all-pnj, to see all pnj on database.
+- Add endpoint : random-pnj, to create random pnj (not save on database).
+
+### 🔄 Changed
+- Changes in existing functionality.
+
+
 ## [0.1.1] - 2023-09-22
 
 ### 📦 Added
@@ -42,9 +52,8 @@ This file outlines all the significant changes made to the project. The format i
 
 ---
 
-
-
 ## Template for new entries
+## [X.X.X] - XXXX-XX-XX
 
 ### 📦 Added
 - New features that have been added.
