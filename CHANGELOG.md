@@ -9,11 +9,23 @@ This file outlines all the significant changes made to the project. The format i
 - Connection to MySQL database - local
 - Basic API endpoint for random firstnames
 
+## [0.1.3] - 2023-09-24
+
+### 📦 Added
+- Add new endpoint `/global/ethnic-distribution-by-nationality` to retrieve the distribution of ethny by nationality.
+
+### 🔄 Changed
+- Changes `random-pnj`, adding the nationality and distribution ethnicity by nationality.
+
+### ⚠️ Deprecated
+- Temporarly delete function `get-all-pnj`.
+
+
 ## [0.1.2] - 2023-09-23
 
 ### 📦 Added
-- Add endpoint : get-all-pnj, to see all pnj on database.
-- Add endpoint : random-pnj, to create random pnj (not save on database).
+- Add endpoint : `get-all-pnj`, to see all pnj on database.
+- Add endpoint : `random-pnj`, to create random pnj (not save on database).
 
 ### 🔄 Changed
 - Changes in existing functionality.

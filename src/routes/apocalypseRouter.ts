@@ -1,5 +1,6 @@
 import express from 'express';
 import { getConnection } from '../config/db'; // Import corrigé
+import { log } from 'console';
 
 interface RowData {
   firstname: string;
@@ -114,12 +115,72 @@ router.get('/random-pnj', async (req, res) => {
     );
     const genderId = gender[0].id_gender; // Remplacer par le vrai champ identifiant du genre dans votre base de données
 
+    const [nationality]: any[] = await connection.query(`
+      SELECT *
+      FROM nationality 
+      ORDER BY RAND() LIMIT 1
+    `);
+    console.log("Nationalité :", nationality);
+    const nationalityId = nationality[0].id_nationnality;
+    console.log("Nationalité :", nationalityId);
+
+    // Première requête pour définir la variable aléatoire
+    // let rand = Math.random() * 100;
+    // console.log('rand', rand);
+
+
+    // // Deuxième requête pour récupérer l'ethnie
+    // const [ethnicityChosen]: any[] = await connection.query(`
+    //   SELECT *
+    //   FROM ethnicdistributionbynationality
+    //   WHERE nationality_id_nationnality = ? AND ? <= percentage
+    //   ORDER BY RAND()
+    //   LIMIT 1
+    // `, [nationalityId, rand]);
+
+    const [rows]: any[] = await connection.query(`
+      SELECT *
+      FROM ethnicdistributionbynationality
+      WHERE nationality_id_nationnality = ?
+    `, [nationalityId]);
+
+    let totalPercentage = 0;
+    let wheel = [];
+
+    console.log('rows',rows);
+    
+
+    for (const row of rows) {
+      wheel.push({
+        name: row.ethnicity_id_ethnicity,
+        min: totalPercentage,
+        max: totalPercentage + row.percentage
+      });
+      totalPercentage += row.percentage;
+    }
+
+    console.log('wheel',wheel);
+    
+    const rand = Math.random() * totalPercentage;
+
+    let ethnicityId = "Unknown";
+    for (const segment of wheel) {
+      if (rand >= segment.min && rand < segment.max) {
+        ethnicityId = segment.name;
+        break;
+      }
+    }
+
+    console.log("ethnicityChosen",ethnicityId);
+    
+
+    console.log("éthnicité :", ethnicityId);
+
     const [ethnicity]: any[] = await connection.query(`
       SELECT *
       FROM ethnicity 
-      ORDER BY RAND() LIMIT 1
-    `);
-    const ethnicityId = ethnicity[0].id_ethnicity;
+      WHERE id_ethnicity = ?
+    `, [ethnicityId]);
 
     const [firstname]: any[] = await connection.query(`
       SELECT firstname.label AS prenom
@@ -160,7 +221,8 @@ router.get('/random-pnj', async (req, res) => {
         firstname: firstname[0].prenom,
         lastname: lastname[0].nom,
         gender: gender[0],
-        ethnicity: ethnicity[0]
+        ethnicity: ethnicity[0],
+        nationality: nationality[0]
       },
       photo: photo[0],
       work: {
