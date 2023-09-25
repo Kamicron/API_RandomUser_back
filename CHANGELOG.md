@@ -14,20 +14,8 @@ This file outlines all the significant changes made to the project. The format i
 ### 📦 Added
 - Added a new endpoint for measuring the size of my database.
 - Added new work on database
-### 🔄 Changed
-- Changes in existing functionality.
-
-### ⚠️ Deprecated
-- Features that were once stable but are no longer recommended and will be removed in future versions.
-
-### 🗑️ Removed
-- Features that have been deprecated or outdated and are now removed.
-
-### 🐛 Fixed
-- Any bug fixes.
-
-### 🔒 Security
-- Implemented any security enhancements.
+- Added new photo on database
+- Added new nationality on database
 
 ## [0.1.3] - 2023-09-24
 
