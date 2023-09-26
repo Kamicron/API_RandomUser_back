@@ -1,7 +1,6 @@
 import express from 'express';
 import { getConnection } from '../config/db'; // Import corrigé
-import { log } from 'console';
-
+import { RowDataPacket } from 'mysql2';
 interface RowData {
   firstname: string;
 }
@@ -103,118 +102,214 @@ router.get('/get-all-pnj', async (req, res) => {
 //   }
 // });
 
+// router.get('/random-pnj', async (req, res) => {
+//   try {
+//     const connection = getConnection();
+//     let result: any = {};
+
+//     const [gender]: any[] = await connection.query(`
+//       SELECT *
+//       FROM gender 
+//       ORDER BY RAND() LIMIT 1`
+//     );
+//     const genderId = gender[0].id_gender; // Remplacer par le vrai champ identifiant du genre dans votre base de données
+
+//     const [nationality]: any[] = await connection.query(`
+//       SELECT *
+//       FROM nationality 
+//       ORDER BY RAND() LIMIT 1
+//     `);
+//     console.log("Nationalité :", nationality);
+//     const nationalityId = nationality[0].id_nationnality;
+//     console.log("Nationalité :", nationalityId);
+
+//     // Première requête pour définir la variable aléatoire
+//     // let rand = Math.random() * 100;
+//     // console.log('rand', rand);
+
+
+//     // // Deuxième requête pour récupérer l'ethnie
+//     // const [ethnicityChosen]: any[] = await connection.query(`
+//     //   SELECT *
+//     //   FROM ethnicdistributionbynationality
+//     //   WHERE nationality_id_nationnality = ? AND ? <= percentage
+//     //   ORDER BY RAND()
+//     //   LIMIT 1
+//     // `, [nationalityId, rand]);
+
+//     const [rows]: any[] = await connection.query(`
+//       SELECT *
+//       FROM ethnicdistributionbynationality
+//       WHERE nationality_id_nationnality = ?
+//     `, [nationalityId]);
+
+//     let totalPercentage = 0;
+//     let wheel = [];
+
+//     console.log('rows',rows);
+    
+
+//     for (const row of rows) {
+//       wheel.push({
+//         name: row.ethnicity_id_ethnicity,
+//         min: totalPercentage,
+//         max: totalPercentage + row.percentage
+//       });
+//       totalPercentage += row.percentage;
+//     }
+
+//     console.log('wheel',wheel);
+    
+//     const rand = Math.random() * totalPercentage;
+
+//     let ethnicityId = "Unknown";
+//     for (const segment of wheel) {
+//       if (rand >= segment.min && rand < segment.max) {
+//         ethnicityId = segment.name;
+//         break;
+//       }
+//     }
+
+//     console.log("ethnicityChosen",ethnicityId);
+    
+
+//     console.log("éthnicité :", ethnicityId);
+
+//     const [ethnicity]: any[] = await connection.query(`
+//       SELECT *
+//       FROM ethnicity 
+//       WHERE id_ethnicity = ?
+//     `, [ethnicityId]);
+
+//     const [firstname]: any[] = await connection.query(`
+//       SELECT firstname.label AS prenom
+//       FROM firstname
+//       WHERE gender_id_gender = ? AND ethnicity_id_ethnicity = ?
+//       ORDER BY RAND() LIMIT 1
+//       `, [genderId, ethnicityId]);
+
+//     const [lastname]: any[] = await connection.query(`
+//       SELECT lastname.label AS nom
+//       FROM lastname
+//       WHERE ethnicity_id_ethnicity = ?
+//       ORDER BY RAND() LIMIT 1
+//     `, [ethnicityId]);
+
+//     const [photo]: any[] = await connection.query(`
+//       SELECT *
+//       FROM photo
+//       ORDER BY RAND() LIMIT 1
+//       `);
+
+//     const [work]: any[] = await connection.query(`
+//       SELECT id_work, label, logo_work
+//       FROM work
+//       ORDER BY RAND() LIMIT 1
+//     `);
+//     const workId = work[0].id_work;
+
+//     const [workName]: any[] = await connection.query(`
+//       SELECT work_name
+//       FROM list_gender_work
+//       WHERE gender_id_gender = ? AND work_id_work = ?
+//       `, [genderId, workId]
+//     );
+
+//     result = {
+//       personalInfo: {
+//         firstname: firstname[0].prenom,
+//         lastname: lastname[0].nom,
+//         gender: gender[0],
+//         ethnicity: ethnicity[0],
+//         nationality: nationality[0]
+//       },
+//       photo: photo[0],
+//       work: {
+//         ...work[0],
+//         displayName: workName[0].work_name
+//       }
+//     };
+
+//     res.json(result);
+
+//   } catch (error) {
+//     console.error('Erreur lors de la génération du PNJ aléatoire :', error);
+//     res.status(500).send('Erreur interne du serveur');
+//   }
+// });
+
 router.get('/random-pnj', async (req, res) => {
   try {
     const connection = getConnection();
     let result: any = {};
 
-    const [gender]: any[] = await connection.query(`
-      SELECT *
-      FROM gender 
-      ORDER BY RAND() LIMIT 1`
-    );
-    const genderId = gender[0].id_gender; // Remplacer par le vrai champ identifiant du genre dans votre base de données
+    const chosenEthnicity = req.query.ethnicity || '';
+    let nationalityId = req.query.nationality || '';
+    let genderId = req.query.gender || '';
 
-    const [nationality]: any[] = await connection.query(`
-      SELECT *
-      FROM nationality 
-      ORDER BY RAND() LIMIT 1
-    `);
-    console.log("Nationalité :", nationality);
-    const nationalityId = nationality[0].id_nationnality;
-    console.log("Nationalité :", nationalityId);
-
-    // Première requête pour définir la variable aléatoire
-    // let rand = Math.random() * 100;
-    // console.log('rand', rand);
+    let nationality: RowDataPacket[] | undefined;
+    let gender: RowDataPacket[] | undefined;
 
 
-    // // Deuxième requête pour récupérer l'ethnie
-    // const [ethnicityChosen]: any[] = await connection.query(`
-    //   SELECT *
-    //   FROM ethnicdistributionbynationality
-    //   WHERE nationality_id_nationnality = ? AND ? <= percentage
-    //   ORDER BY RAND()
-    //   LIMIT 1
-    // `, [nationalityId, rand]);
+    if (genderId) {
+      const queryResult = await connection.query('SELECT * FROM gender WHERE id_gender = ?', [genderId]);
+      gender = queryResult[0] as RowDataPacket[];
+    } else {
+      const queryResult = await connection.query('SELECT * FROM gender ORDER BY RAND() LIMIT 1');
+      
+      gender = queryResult[0] as RowDataPacket[];
 
-    const [rows]: any[] = await connection.query(`
-      SELECT *
-      FROM ethnicdistributionbynationality
-      WHERE nationality_id_nationnality = ?
-    `, [nationalityId]);
-
-    let totalPercentage = 0;
-    let wheel = [];
-
-    console.log('rows',rows);
-    
-
-    for (const row of rows) {
-      wheel.push({
-        name: row.ethnicity_id_ethnicity,
-        min: totalPercentage,
-        max: totalPercentage + row.percentage
-      });
-      totalPercentage += row.percentage;
+      genderId = gender[0].id_gender;
     }
 
-    console.log('wheel',wheel);
-    
-    const rand = Math.random() * totalPercentage;
+    // const [gender]: any[] = await connection.query('SELECT * FROM gender ORDER BY RAND() LIMIT 1');
+    // const genderId = gender[0].id_gender;
 
-    let ethnicityId = "Unknown";
-    for (const segment of wheel) {
-      if (rand >= segment.min && rand < segment.max) {
-        ethnicityId = segment.name;
-        break;
+
+    if (nationalityId) {
+      const queryResult = await connection.query('SELECT * FROM nationality WHERE id_nationnality = ?', [nationalityId]);
+      nationality = queryResult[0] as RowDataPacket[];
+    } else {
+      const queryResult = await connection.query('SELECT * FROM nationality ORDER BY RAND() LIMIT 1');
+      nationality = queryResult[0] as RowDataPacket[];
+      nationalityId = nationality[0].id_nationnality;
+    }
+    
+    // const [nationality]: any[] = await connection.query('SELECT * FROM nationality ORDER BY RAND() LIMIT 1');
+
+    let ethnicityId;
+    if (chosenEthnicity) {
+      ethnicityId = chosenEthnicity;
+    } else {
+      const [rows]: any[] = await connection.query('SELECT * FROM ethnicdistributionbynationality WHERE nationality_id_nationnality = ?', [nationalityId]);
+      
+      let totalPercentage = 0;
+      let wheel = [];
+      for (const row of rows) {
+        wheel.push({
+          name: row.ethnicity_id_ethnicity,
+          min: totalPercentage,
+          max: totalPercentage + row.percentage,
+        });
+        totalPercentage += row.percentage;
+      }
+
+      const rand = Math.random() * totalPercentage;
+      for (const segment of wheel) {
+        if (rand >= segment.min && rand < segment.max) {
+          ethnicityId = segment.name;
+          break;
+        }
       }
     }
 
-    console.log("ethnicityChosen",ethnicityId);
-    
-
-    console.log("éthnicité :", ethnicityId);
-
-    const [ethnicity]: any[] = await connection.query(`
-      SELECT *
-      FROM ethnicity 
-      WHERE id_ethnicity = ?
-    `, [ethnicityId]);
-
-    const [firstname]: any[] = await connection.query(`
-      SELECT firstname.label AS prenom
-      FROM firstname
-      WHERE gender_id_gender = ? AND ethnicity_id_ethnicity = ?
-      ORDER BY RAND() LIMIT 1
-      `, [genderId, ethnicityId]);
-
-    const [lastname]: any[] = await connection.query(`
-      SELECT lastname.label AS nom
-      FROM lastname
-      WHERE ethnicity_id_ethnicity = ?
-      ORDER BY RAND() LIMIT 1
-    `, [ethnicityId]);
-
-    const [photo]: any[] = await connection.query(`
-      SELECT *
-      FROM photo
-      ORDER BY RAND() LIMIT 1
-      `);
-
-    const [work]: any[] = await connection.query(`
-      SELECT id_work, label, logo_work
-      FROM work
-      ORDER BY RAND() LIMIT 1
-    `);
+    const [ethnicity]: any[] = await connection.query('SELECT * FROM ethnicity WHERE id_ethnicity = ?', [ethnicityId]);
+    const [firstname]: any[] = await connection.query('SELECT firstname.label AS prenom FROM firstname WHERE gender_id_gender = ? AND ethnicity_id_ethnicity = ? ORDER BY RAND() LIMIT 1', [genderId, ethnicityId]);
+    const [lastname]: any[] = await connection.query('SELECT lastname.label AS nom FROM lastname WHERE ethnicity_id_ethnicity = ? ORDER BY RAND() LIMIT 1', [ethnicityId]);
+    const [photo]: any[] = await connection.query('SELECT * FROM photo ORDER BY RAND() LIMIT 1');
+    const [work]: any[] = await connection.query('SELECT id_work, label, logo_work FROM work ORDER BY RAND() LIMIT 1');
     const workId = work[0].id_work;
-
-    const [workName]: any[] = await connection.query(`
-      SELECT work_name
-      FROM list_gender_work
-      WHERE gender_id_gender = ? AND work_id_work = ?
-      `, [genderId, workId]
-    );
+    const [workName]: any[] = await connection.query('SELECT work_name FROM list_gender_work WHERE gender_id_gender = ? AND work_id_work = ?', [genderId, workId]);
 
     result = {
       personalInfo: {
@@ -222,21 +317,22 @@ router.get('/random-pnj', async (req, res) => {
         lastname: lastname[0].nom,
         gender: gender[0],
         ethnicity: ethnicity[0],
-        nationality: nationality[0]
+        nationality: nationality[0],
       },
       photo: photo[0],
       work: {
         ...work[0],
-        displayName: workName[0].work_name
-      }
+        displayName: workName[0].work_name,
+      },
     };
 
     res.json(result);
-
   } catch (error) {
     console.error('Erreur lors de la génération du PNJ aléatoire :', error);
     res.status(500).send('Erreur interne du serveur');
   }
 });
+
+
 
 export default router;
