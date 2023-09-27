@@ -9,6 +9,14 @@ This file outlines all the significant changes made to the project. The format i
 - Connection to MySQL database - local
 - Basic API endpoint for random firstnames
 
+## [0.1.6] - 2023-09-27
+
+### 🔄 Changed
+- The logic of `global` endpoint.
+
+### ⚠️ Deprecated
+- Endpoint `stats` change to `global/stats`.
+
 ## [0.1.5] - 2023-09-26
 
 ### 📦 Added

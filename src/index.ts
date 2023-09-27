@@ -3,9 +3,12 @@ import cors from 'cors';
 import { initializeConnection } from './config/db'; // Mettez à jour le chemin si nécessaire
 import mainRouter from './routes';
 
+
+
 const app = express();
 const port = 3001; // Vous pouvez changer le port selon vos besoins
 app.use(cors());
+app.use(express.static('public'))
 
 const startServer = async () => {
   try {
