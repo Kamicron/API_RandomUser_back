@@ -15,22 +15,22 @@ async function queryData(connection: any, tableName: string): Promise<RowDataPac
   }
 }
 
-async function queryEthnicDistribution(connection: any): Promise<any> {
+async function querysuboriginDistribution(connection: any): Promise<any> {
   try {
     const query = `
     SELECT 
-    eth.label AS ethnicity_label,
-    eth.display_name AS ethnicity_display_name_fr,
-    nat.label AS nationality_label,
-    nat.display_name_fr AS nationality_display_name_fr,
-    nat.flag AS nationality_flag,
+    eth.label AS suborigin_label,
+    eth.display_name AS suborigin_display_name_fr,
+    nat.label AS origin_label,
+    nat.display_name_fr AS origin_display_name_fr,
+    nat.flag AS origin_flag,
     edn.percentage AS percentage
   FROM 
-    ethnicdistributionbynationality edn
+    suborigindistributionbyorigin edn
   JOIN 
-    nationality nat ON edn.nationality_id_nationnality = nat.id_nationnality
+    origin nat ON edn.origin_id_origin = nat.id_nationnality
   JOIN 
-    ethnicity eth ON edn.ethnicity_id_ethnicity = eth.id_ethnicity
+    suborigin eth ON edn.suborigin_id_suborigin = eth.id_suborigin
   ORDER BY 
     nat.label, eth.label
     `;
@@ -38,23 +38,23 @@ async function queryEthnicDistribution(connection: any): Promise<any> {
     const [rows]: any[] = await connection.query(query);
     
     return rows.reduce((acc, row) => {
-      const nationality = row.nationality_label;
+      const origin = row.origin_label;
       
-      if (!acc[nationality]) {
-        acc[nationality] = {
-          flag: row.nationality_flag,
+      if (!acc[origin]) {
+        acc[origin] = {
+          flag: row.origin_flag,
           language: {
-            display_name_fr: row.nationality_display_name_fr
+            display_name_fr: row.origin_display_name_fr
           },
-          ethnicities: []
+          suboriginities: []
         };
       }
       
-      acc[nationality].ethnicities.push({
-        label: row.ethnicity_label,
+      acc[origin].suboriginities.push({
+        label: row.suborigin_label,
         percentage: row.percentage,
         language: {
-          display_name_fr: row.ethnicity_display_name_fr
+          display_name_fr: row.suborigin_display_name_fr
         }
       });
       
@@ -79,8 +79,8 @@ async function countEntries(connection: any, tableName: string): Promise<number>
 async function getStats(connection: any): Promise<any> {
   const firstnameCount = await countEntries(connection, 'firstname');
   const lastnameCount = await countEntries(connection, 'lastname');
-  const nationalityCount = await countEntries(connection, 'nationality');
-  const ethnicityCount = await countEntries(connection, 'ethnicity');
+  const originCount = await countEntries(connection, 'origin');
+  const suboriginCount = await countEntries(connection, 'suborigin');
   const workCount = await countEntries(connection, 'work');
   const photoCount = await countEntries(connection, 'photo');
   const genderCount = await countEntries(connection, 'gender');
@@ -90,8 +90,8 @@ async function getStats(connection: any): Promise<any> {
   return {
     firstname: firstnameCount,
     lastname: lastnameCount,
-    nationality: nationalityCount,
-    ethnicity: ethnicityCount,
+    origin: originCount,
+    suborigin: suboriginCount,
     work: workCount,
     photo: photoCount,
     gender: genderCount,
@@ -105,10 +105,10 @@ router.get('/information-table', async (req, res) => {
   const result: any = {};
 
   result.gender = await queryData(connection, 'gender');
-  result.ethnicity = await queryData(connection, 'ethnicity');
-  result.nationality = await queryData(connection, 'nationality');
+  result.suborigin = await queryData(connection, 'suborigin');
+  result.origin = await queryData(connection, 'origin');
   result.work = await queryData(connection, 'work');
-  result.ethnicDistribution = await queryEthnicDistribution(connection);
+  result.suboriginDistribution = await querysuboriginDistribution(connection);
   result.stats = await getStats(connection);
   res.json(result);
 });
@@ -122,20 +122,20 @@ router.get('/information-table/gender', async (req, res) => {
   res.json(result);
 });
 
-router.get('/information-table/ethnicity', async (req, res) => {
+router.get('/information-table/suborigin', async (req, res) => {
   const connection = getConnection();
   const result: any = {};
 
-  result.ethnicity = await queryData(connection, 'ethnicity');
+  result.suborigin = await queryData(connection, 'suborigin');
 
   res.json(result);
 });
 
-router.get('/information-table/nationality', async (req, res) => {
+router.get('/information-table/origin', async (req, res) => {
   const connection = getConnection();
   const result: any = {};
 
-  result.nationality = await queryData(connection, 'nationality');
+  result.origin = await queryData(connection, 'origin');
 
   res.json(result);
 });
@@ -149,9 +149,9 @@ router.get('/information-table/work', async (req, res) => {
   res.json(result);
 });
 
-router.get('/information-table/ethnic-distribution-by-nationality', async (req, res) => {
+router.get('/information-table/suborigin-distribution-by-origin', async (req, res) => {
   const connection = getConnection();
-  const result = await queryEthnicDistribution(connection);
+  const result = await querysuboriginDistribution(connection);
   
   res.json(result);
 });
