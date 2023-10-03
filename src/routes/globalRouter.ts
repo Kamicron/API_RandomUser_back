@@ -28,7 +28,7 @@ async function querysuboriginDistribution(connection: any): Promise<any> {
   FROM 
     suborigindistributionbyorigin edn
   JOIN 
-    origin nat ON edn.origin_id_origin = nat.id_nationnality
+    origin nat ON edn.origin_id_origin = nat.id_origin
   JOIN 
     suborigin eth ON edn.suborigin_id_suborigin = eth.id_suborigin
   ORDER BY 

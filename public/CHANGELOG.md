@@ -9,6 +9,14 @@ This file outlines all the significant changes made to the project. The format i
 - Connection to MySQL database - local
 - Basic API endpoint for random firstnames
 
+## [0.1.7] - 2023-10-02
+
+### 📦 Added
+- New table in database
+
+### 🔄 Changed
+- Changes the data value from to database.
+
 ## [0.1.6] - 2023-09-27
 
 ### 🔄 Changed
