@@ -33,7 +33,7 @@ const router = express.Router();
 //         gender.display_name AS display_name_genre,
 //         photo.src AS nom_photo,
 //         photo.alt AS alt_photo,
-//         list_gender_work.work_name AS work_name,
+//         list_gender_work.display_name_fr AS display_name_fr,
 //         work.logo_work AS work_logo
 //     FROM
 //         apocalypse_reborn.pnj
@@ -72,7 +72,7 @@ const router = express.Router();
 //         display_name_genre: row.display_name_genre,
 //         nom_photo: row.nom_photo,
 //         alt_photo: row.alt_photo,
-//         work_name: row.work_name,
+//         display_name_fr: row.display_name_fr,
 //         work_logo: row.work_logo,
 //       };
 //     });
@@ -200,7 +200,7 @@ router.get('/random-pnj', async (req, res) => {
     // Choix du travail
     const [work]: any[] = await connection.query('SELECT id_work, label, logo_work FROM work ORDER BY RAND() LIMIT 1');
     const workId = work[0].id_work;
-    const [workName]: any[] = await connection.query('SELECT work_name FROM list_gender_work WHERE gender_id_gender = ? AND work_id_work = ?', [genderId, workId]);
+    const [workName]: any[] = await connection.query('SELECT display_name_fr FROM list_gender_work WHERE gender_id_gender = ? AND work_id_work = ?', [genderId, workId]);
 
     const [system]: any[] = await connection.query('SELECT * FROM system WHERE id_system = ?', [systemId]);
     const [species]: any[] = await connection.query('SELECT * FROM species WHERE id_species = ?', [speciesId]);
@@ -222,7 +222,7 @@ router.get('/random-pnj', async (req, res) => {
         id: workId,
         label: work[0].label,
         logo: work[0].logo_work,
-        displayName: workName[0].work_name,
+        displayName: workName[0].display_name_fr,
       },
     };
 
@@ -305,7 +305,7 @@ router.get('/random-pnj', async (req, res) => {
 //     const [photo]: any[] = await connection.query('SELECT * FROM photo ORDER BY RAND() LIMIT 1');
 //     const [work]: any[] = await connection.query('SELECT id_work, label, logo_work FROM work ORDER BY RAND() LIMIT 1');
 //     const workId = work[0].id_work;
-//     const [workName]: any[] = await connection.query('SELECT work_name FROM list_gender_work WHERE gender_id_gender = ? AND work_id_work = ?', [genderId, workId]);
+//     const [workName]: any[] = await connection.query('SELECT display_name_fr FROM list_gender_work WHERE gender_id_gender = ? AND work_id_work = ?', [genderId, workId]);
 
 //     result = {
 //       personalInfo: {
@@ -318,7 +318,7 @@ router.get('/random-pnj', async (req, res) => {
 //       photo: photo[0],
 //       work: {
 //         ...work[0],
-//         displayName: workName[0].work_name,
+//         displayName: workName[0].display_name_fr,
 //       },
 //     };
 
