@@ -20,8 +20,7 @@ async function queryData(connection: any, tableName: string, transformFunction?:
   }
 }
 
-// Fonction de transformation pour la table 'gender'
-function transformGender(data: any[]) {
+function transformGeneral(data: any[]) {
   return data.map(item => {
     // Création d'un nouvel objet pour les langues
     const language: any = {};
@@ -44,28 +43,28 @@ function transformGender(data: any[]) {
 }
 
 
-function transformSuborigin(data: any[]) {
-  return data.map(item => {
-    // Créer un nouvel objet pour les langues
-    const language: any = {};
+// function transformSuborigin(data: any[]) {
+//   return data.map(item => {
+//     // Créer un nouvel objet pour les langues
+//     const language: any = {};
 
-    // Filtrer les clés qui commencent par "display_name_" et les ajouter à l'objet language
-    for (const [key, value] of Object.entries(item)) {
-      if (key.startsWith('display_name_')) {
-        const langKey = key.split('display_name_')[1]; // obtenir la partie langue de la clé
-        language[langKey] = value;
-        delete item[key]; // supprimer la clé originale de l'objet item
-      }
-    }
+//     // Filtrer les clés qui commencent par "display_name_" et les ajouter à l'objet language
+//     for (const [key, value] of Object.entries(item)) {
+//       if (key.startsWith('display_name_')) {
+//         const langKey = key.split('display_name_')[1]; // obtenir la partie langue de la clé
+//         language[langKey] = value;
+//         delete item[key]; // supprimer la clé originale de l'objet item
+//       }
+//     }
 
-    // Retourner l'objet restructuré avec uniquement les propriétés nécessaires et l'objet language ajouté
-    return {
-      id_suborigin: item.id_suborigin,
-      label: item.label,
-      language // ajouter l'objet language ici
-    };
-  });
-}
+//     // Retourner l'objet restructuré avec uniquement les propriétés nécessaires et l'objet language ajouté
+//     return {
+//       id_suborigin: item.id_suborigin,
+//       label: item.label,
+//       language // ajouter l'objet language ici
+//     };
+//   });
+// }
 
 function transformOrigin(data: any[]) {
   return data.map(item => {
@@ -123,8 +122,6 @@ function transformWork(rows: any[]): any {
     return acc;
   }, {});
 }
-
-
 
 
 async function querysuboriginDistribution(connection: any): Promise<any> {
@@ -245,8 +242,8 @@ router.get('/information-table', async (req, res) => {
   const connection = getConnection();
   const result: any = {};
 
-  result.gender = await queryData(connection, 'gender', transformGender);
-  result.suborigin = await queryData(connection, 'suborigin', transformSuborigin);
+  result.gender = await queryData(connection, 'gender', transformGeneral);
+  result.suborigin = await queryData(connection, 'suborigin', transformGeneral);
   result.origin = await queryData(connection, 'origin', transformOrigin);
   result.work = await queryDataWithJoin(connection, 'work', 'list_gender_work', transformWork);
   result.suboriginDistribution = await querysuboriginDistribution(connection);
@@ -254,10 +251,32 @@ router.get('/information-table', async (req, res) => {
   res.json(result);
 });
 
+router.get('/information-table/system', async (req, res) => {
+  const connection = getConnection();
+
+  const systemData = await queryData(connection, 'system', transformGeneral);
+
+  // Ajouter le résultat restructuré à l'objet result
+  const result = { system: systemData };
+
+  res.json(result);
+});
+
+router.get('/information-table/species', async (req, res) => {
+  const connection = getConnection();
+
+  const speciesData = await queryData(connection, 'species', transformGeneral);
+
+  // Ajouter le résultat restructuré à l'objet result
+  const result = { species: speciesData };
+
+  res.json(result);
+});
+
 router.get('/information-table/gender', async (req, res) => {
   const connection = getConnection();
 
-  const genderData = await queryData(connection, 'gender', transformGender);
+  const genderData = await queryData(connection, 'gender', transformGeneral);
 
   // Ajouter le résultat restructuré à l'objet result
   const result = { gender: genderData };
@@ -268,7 +287,7 @@ router.get('/information-table/gender', async (req, res) => {
 router.get('/information-table/suborigin', async (req, res) => {
   const connection = getConnection();
 
-  const suboriginData = await queryData(connection, 'suborigin', transformSuborigin);
+  const suboriginData = await queryData(connection, 'suborigin', transformGeneral);
 
   // Ajouter les données transformées à l'objet result
   const result = { suborigin: suboriginData };
