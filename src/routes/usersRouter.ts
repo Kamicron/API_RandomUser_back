@@ -1,7 +1,7 @@
 import express from 'express';
 import { getConnection } from '../config/db';
 import { RowDataPacket } from 'mysql2';
-import bcrypt from 'bcrypt'; // Assurez-vous que c'est installé
+import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid'; // Assurez-vous que c'est installé
 import nodemailer from 'nodemailer';
 
@@ -11,7 +11,7 @@ const router = express.Router();
 export const registerUser = async (login: string, email: string, password: string): Promise<void> => {
   const connection = await getConnection();
   
-  // Vérifier si l'utilisateur existe déjà
+  // Vérifier si l'utilisateur existe déjàd
   const [userResult] = await connection.execute('SELECT id_users FROM users WHERE email = ?', [email]);
   if (Array.isArray(userResult) && userResult.length > 0) {
     throw new Error('Un utilisateur avec cet email existe déjà.');
@@ -81,5 +81,36 @@ router.post('/inscription', async (req, res) => {
 });
 
 
+// CONNEXION
 
+export const loginUser = async (email: string, password: string): Promise<any> => {
+  const connection = await getConnection();
+
+  // Trouver l'utilisateur par email
+  const [users] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+  const user = Array.isArray(users) ? users[0] : null;
+
+  // Vérifier si l'utilisateur existe et si le mot de passe est correct
+  if (user && await bcrypt.compare(password, user.password)) {
+    // L'utilisateur est authentifié, retournez les informations nécessaires (sans le mot de passe)
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  } else {
+    throw new Error('Email ou mot de passe incorrect.');
+  }
+};
+
+router.post('/connexion', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).send('Email et mot de passe sont requis.');
+    }
+
+    const user = await loginUser(email, password);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(401).send('Connexion échouée: ' + error.message);
+  }
+});
 export default router;
