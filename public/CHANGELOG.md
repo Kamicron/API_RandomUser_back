@@ -9,6 +9,11 @@ This file outlines all the significant changes made to the project. The format i
 - Connection to MySQL database - local
 - Basic API endpoint for random firstnames
 
+## [0.2.0] - 2023-11-05
+
+### 📦 Added
+- Add route `/users/inscription` to create account.
+- Add route `/users/connexion` to connect to account.
 
 ## [0.1.9] - 2023-11-05
 
@@ -18,18 +23,11 @@ This file outlines all the significant changes made to the project. The format i
 ### 🔄 Changed
 - Changes on logic to retrieve language (introduction to language {'fr'}) for `random_pnj` route.
 
-### ⚠️ Deprecated
-- Features that were once stable but are no longer recommended and will be removed in future versions.
-
-### 🗑️ Removed
-- Features that have been deprecated or outdated and are now removed.
 
 ### 🐛 Fixed
 - Fix `?suborigin=id` on `/random-pnj` request.
 - Fix link between origin and species on `/random-pnj` request
 
-### 🔒 Security
-- Implemented any security enhancements.
 
 
 ## [0.1.8] - 2023-11-05
