@@ -6,7 +6,7 @@ import mainRouter from './routes';
 
 
 const app = express();
-const port = 3001; // Vous pouvez changer le port selon vos besoins
+const port = process.env.PORT; // Vous pouvez changer le port selon vos besoins
 app.use(cors());
 app.use(express.static('public'))
 

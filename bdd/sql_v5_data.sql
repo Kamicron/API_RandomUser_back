@@ -25,39 +25,39 @@ DELIMITER $$
 --
 -- Procédures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateRandomPNJ` ()   BEGIN
-    DECLARE randomGenderID INT;
-    DECLARE randomEthnicityID INT;
-    DECLARE randomFirstname VARCHAR(45);
-    DECLARE randomLastname VARCHAR(45);
-    DECLARE randomPhotoID INT;
-    DECLARE randomWorkID INT;
+-- CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateRandomPNJ` ()   BEGIN
+--     DECLARE randomGenderID INT;
+--     DECLARE randomEthnicityID INT;
+--     DECLARE randomFirstname VARCHAR(45);
+--     DECLARE randomLastname VARCHAR(45);
+--     DECLARE randomPhotoID INT;
+--     DECLARE randomWorkID INT;
 
-    -- Choisir un genre aléatoirement
-    SET randomGenderID = (SELECT id_gender FROM gender ORDER BY RAND() LIMIT 1);
+--     -- Choisir un genre aléatoirement
+--     SET randomGenderID = (SELECT id_gender FROM gender ORDER BY RAND() LIMIT 1);
 
-    -- Choisir une ethnie aléatoirement
-    SET randomEthnicityID = (SELECT id_ethnicity FROM ethnicity ORDER BY RAND() LIMIT 1);
+--     -- Choisir une ethnie aléatoirement
+--     SET randomEthnicityID = (SELECT id_ethnicity FROM ethnicity ORDER BY RAND() LIMIT 1);
 
-    -- Choisir un prénom en fonction de l'ethnie et du genre
-    -- Remarque: Vous devrez ajuster cette requête en fonction de la structure réelle de votre base de données
-    SET randomFirstname = (SELECT firstname FROM your_table_with_firstnames WHERE gender_id = randomGenderID AND ethnicity_id = randomEthnicityID ORDER BY RAND() LIMIT 1);
+--     -- Choisir un prénom en fonction de l'ethnie et du genre
+--     -- Remarque: Vous devrez ajuster cette requête en fonction de la structure réelle de votre base de données
+--     SET randomFirstname = (SELECT firstname FROM your_table_with_firstnames WHERE gender_id = randomGenderID AND ethnicity_id = randomEthnicityID ORDER BY RAND() LIMIT 1);
 
-    -- Choisir un nom en fonction de l'ethnie
-    -- Remarque: Vous devrez ajuster cette requête en fonction de la structure réelle de votre base de données
-    SET randomLastname = (SELECT lastname FROM your_table_with_lastnames WHERE ethnicity_id = randomEthnicityID ORDER BY RAND() LIMIT 1);
+--     -- Choisir un nom en fonction de l'ethnie
+--     -- Remarque: Vous devrez ajuster cette requête en fonction de la structure réelle de votre base de données
+--     SET randomLastname = (SELECT lastname FROM your_table_with_lastnames WHERE ethnicity_id = randomEthnicityID ORDER BY RAND() LIMIT 1);
 
-    -- Choisir une photo en fonction de l'ethnie et du genre
-    SET randomPhotoID = (SELECT id_photo FROM photo WHERE gender_id = randomGenderID AND ethnicity_id = randomEthnicityID ORDER BY RAND() LIMIT 1);
+--     -- Choisir une photo en fonction de l'ethnie et du genre
+--     SET randomPhotoID = (SELECT id_photo FROM photo WHERE gender_id = randomGenderID AND ethnicity_id = randomEthnicityID ORDER BY RAND() LIMIT 1);
 
-    -- Choisir un métier aléatoirement
-    SET randomWorkID = (SELECT id_work FROM work ORDER BY RAND() LIMIT 1);
+--     -- Choisir un métier aléatoirement
+--     SET randomWorkID = (SELECT id_work FROM work ORDER BY RAND() LIMIT 1);
 
-    -- Insérer le nouveau PNJ dans la table 'pnj'
-    INSERT INTO pnj (firstname, lastname, gender_id_gender, ethnicity_id_ethnicity, photo_id_photo, work_id_work)
-    VALUES (randomFirstname, randomLastname, randomGenderID, randomEthnicityID, randomPhotoID, randomWorkID);
+--     -- Insérer le nouveau PNJ dans la table 'pnj'
+--     INSERT INTO pnj (firstname, lastname, gender_id_gender, ethnicity_id_ethnicity, photo_id_photo, work_id_work)
+--     VALUES (randomFirstname, randomLastname, randomGenderID, randomEthnicityID, randomPhotoID, randomWorkID);
     
-END$$
+-- END$$
 
 DELIMITER ;
 
