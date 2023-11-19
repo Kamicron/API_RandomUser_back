@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'; // Assurez-vous que c'est installé
 import nodemailer from 'nodemailer';
 
 const router = express.Router();
+const saltRounds = 10; // Vous pouvez augmenter pour plus de sécurité
 
 // La fonction pour inscrire un nouvel utilisateur
 export const registerUser = async (login: string, email: string, password: string): Promise<void> => {
@@ -18,7 +19,6 @@ export const registerUser = async (login: string, email: string, password: strin
   }
 
   // Hacher le mot de passe
-  const saltRounds = 10; // Vous pouvez augmenter pour plus de sécurité
   const passwordHash = await bcrypt.hash(password, saltRounds);
 
   // Générer un token de vérification
@@ -113,4 +113,69 @@ router.post('/connexion', async (req, res) => {
     res.status(401).send('Connexion échouée: ' + error.message);
   }
 });
+
+router.put('/update-login', async (req, res) => {
+  try {
+    const { userId, newLogin } = req.body;
+    // Validation de newLogin...
+
+    const connection = getConnection();
+    await connection.query('UPDATE users SET login = ? WHERE id_users = ?', [newLogin, userId]);
+
+    // Récupérer les données de l'utilisateur après la mise à jour
+    const [updatedUser] = await connection.execute('SELECT * FROM users WHERE id_users = ?', [userId]);
+    const user = Array.isArray(updatedUser) ? updatedUser[0] : null;
+
+    res.json({ message: 'Login mis à jour avec succès', user });
+  } catch (error) {
+    console.error('Erreur lors de la modification du login : ', error);
+    res.status(500).send('Erreur interne du serveur');
+  }
+});
+
+
+router.put('/update-email', async (req, res) => {
+  try {
+    const { userId, newEmail } = req.body;
+    // Validation de newEmail...
+
+    const connection = getConnection();
+    await connection.query('UPDATE users SET email = ? WHERE id_users = ?', [newEmail, userId]);
+
+    // Récupérer les données de l'utilisateur après la mise à jour
+    const [updatedUser] = await connection.execute('SELECT * FROM users WHERE id_users = ?', [userId]);
+    const user = Array.isArray(updatedUser) ? updatedUser[0] : null;
+
+    res.json({ message: 'Adresse e-mail mise à jour avec succès', user });
+  } catch (error) {
+    console.error('Erreur lors de la modification de l\'adresse e-mail : ', error);
+    res.status(500).send('Erreur interne du serveur');
+  }
+});
+
+
+router.put('/update-password', async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+    // Validation de newPassword...
+
+    // Hashage du mot de passe
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    const connection = getConnection();
+    await connection.query('UPDATE users SET password = ? WHERE id_users = ?', [hashedPassword, userId]);
+
+    // Récupérer les données de l'utilisateur après la mise à jour
+    const [updatedUser] = await connection.execute('SELECT * FROM users WHERE id_users = ?', [userId]);
+    const user = Array.isArray(updatedUser) ? updatedUser[0] : null;
+
+    res.json({ message: 'Mot de passe mis à jour avec succès', user });
+  } catch (error) {
+    console.error('Erreur lors de la modification du mot de passe : ', error);
+    res.status(500).send('Erreur interne du serveur');
+  }
+});
+
+
+
 export default router;
